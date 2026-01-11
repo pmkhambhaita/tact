@@ -11,7 +11,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // --- Security & Config ---
-app.use(cors({ origin: '*' }));
+app.use(cors({
+  origin: ['https://tact-fix.vercel.app', 'http://localhost:5173', 'http://localhost:3000'] // Allow Prod + Local
+}));
 app.use(express.json());
 
 const apiLimiter = rateLimit({
@@ -29,7 +31,7 @@ const googleGenAI = process.env.GOOGLE_API_KEY ? new GoogleGenerativeAI(process.
 // --- Models ---
 const GROQ_MODEL = 'groq/compound';
 // Using Gemma 2 9B as requested previously
-const GOOGLE_MODEL_NAME = 'gemma-2-9b-it';
+const GOOGLE_MODEL_NAME = 'gemma-3-12b-it';
 
 // Health Check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', provider: 'Tact API' }));
@@ -137,6 +139,11 @@ app.post('/api/analyze', async (req, res) => {
   const { text, settings } = req.body;
 
   if (!text) return res.status(400).json({ error: 'Text is required' });
+
+  // Security: Max Length Check (2500 chars ~ 500 tokens)
+  if (text.length > 2500) {
+    return res.status(400).json({ error: 'Message too long. Please keep it under 2500 characters.' });
+  }
 
   const prompt = `Analyze this message sent to a "${settings.receiverType}" with intended tone "${settings.intendedTone}". User interaction traits: "${settings.userTraits}". Message: "${text}"`;
 
