@@ -1,59 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tact - Communication Coach</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              slate: {
-                50: '#f8fafc',
-                100: '#f1f5f9',
-                800: '#1e293b',
-                900: '#0f172a',
-              },
-              orange: {
-                50: '#fff7ed',
-                400: '#fb923c',
-                500: '#f97316',
-              }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tact - Communication Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          colors: {
+            slate: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              800: '#1e293b',
+              900: '#0f172a',
             },
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
+            orange: {
+              50: '#fff7ed',
+              400: '#fb923c',
+              500: '#f97316',
             }
           }
         }
       }
-    </script>
-    <style>
-      body {
-        background-color: #f8fafc;
-        color: #0f172a;
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    }
+  </script>
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+  </style>
 
-    "dotenv/": "https://esm.sh/dotenv@^17.2.3/",
-    "cors": "https://esm.sh/cors@^2.8.5",
-    "express": "https://esm.sh/express@^5.2.1",
-    "express-rate-limit": "https://esm.sh/express-rate-limit@^8.2.1"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/index.css">
 </head>
-  <body>
-    <div id="root"></div>
+
+<body>
+  <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>

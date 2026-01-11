@@ -21,8 +21,13 @@ const SmartText: React.FC<SmartTextProps> = ({ text, highlights }) => {
   // A robust production app would handle overlapping or multiple identical substrings by index.
 
   // Create a regex pattern that matches any of the substrings
+  // Safety check: filter out invalid items first
+  const validHighlights = highlights.filter(h => h && h.text);
+
+  if (validHighlights.length === 0) return <span>{text}</span>;
+
   const pattern = new RegExp(
-    `(${highlights.map(h => escapeRegExp(h.substring)).join('|')})`,
+    `(${validHighlights.map(h => escapeRegExp(h.text)).join('|')})`,
     'g'
   );
 
@@ -31,13 +36,16 @@ const SmartText: React.FC<SmartTextProps> = ({ text, highlights }) => {
   return (
     <>
       {parts.map((part, index) => {
-        const highlight = highlights.find(h => h.substring === part);
+        const highlight = validHighlights.find(h => h.text === part);
 
         if (highlight) {
           return (
             <span key={index} className="relative group inline-block">
               {/* Highlighted Text */}
-              <span className="underline decoration-orange-400 decoration-2 underline-offset-4 cursor-help text-slate-900 font-medium bg-orange-50/50 rounded px-0.5">
+              <span className={`underline decoration-2 underline-offset-4 cursor-help font-medium px-0.5 rounded ${highlight.type === 'positive' ? 'decoration-green-400 bg-green-50 text-green-900' :
+                  highlight.type === 'negative' ? 'decoration-red-400 bg-red-50 text-red-900' :
+                    'decoration-orange-400 bg-orange-50 text-slate-900'
+                }`}>
                 {part}
               </span>
 
@@ -46,13 +54,20 @@ const SmartText: React.FC<SmartTextProps> = ({ text, highlights }) => {
                   {/* Arrow */}
                   <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-2 border-8 border-transparent border-t-slate-900"></div>
 
-                  <div className="font-semibold text-orange-300 mb-1 text-xs uppercase tracking-wide">
-                    Issue: {highlight.reason}
-                  </div>
-                  <div className="text-slate-200">
-                    <span className="text-slate-400 mr-2">Try:</span>
-                    "{highlight.better_alternative}"
-                  </div>
+                  {highlight.type && (
+                    <div className={`font-semibold mb-1 text-xs uppercase tracking-wide ${highlight.type === 'positive' ? 'text-green-300' :
+                        highlight.type === 'negative' ? 'text-red-300' : 'text-orange-300'
+                      }`}>
+                      {highlight.type}
+                    </div>
+                  )}
+
+                  {highlight.suggestion && (
+                    <div className="text-slate-200">
+                      <span className="text-slate-400 mr-2">Suggestion:</span>
+                      "{highlight.suggestion}"
+                    </div>
+                  )}
                 </div>
               </div>
             </span>

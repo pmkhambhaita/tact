@@ -1,8 +1,7 @@
 export interface Highlight {
-  substring: string;
-  severity: 'high' | 'medium' | 'low';
-  reason: string;
-  better_alternative: string;
+  text: string;           // The substring to highlight
+  type: 'positive' | 'negative' | 'neutral';
+  suggestion: string;     // The suggestion or reason
 }
 
 export interface AudiencePerception {
