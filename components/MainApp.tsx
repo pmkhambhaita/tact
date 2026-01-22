@@ -8,6 +8,7 @@ import PullSwitch from './PullSwitch';
 import ShaderBackground from './ShaderBackground';
 import LoadingScreen from './LoadingScreen';
 import TiltCard from './TiltCard';
+import DisclaimerModal from './DisclaimerModal';
 import { AnalysisResult, AnalysisSettings, HistoryItem } from '../types';
 
 const RECEIVER_OPTIONS = ["Boss", "Coworker", "Partner", "Friend", "Client", "Parent"];
@@ -146,6 +147,8 @@ const MainApp: React.FC = () => {
             <AnimatePresence>
                 {loadingApp && <LoadingScreen isDark={isDark} />}
             </AnimatePresence>
+
+            <DisclaimerModal isDark={isDark} onAccept={() => { }} />
 
             <div className={`min-h-screen transition-colors duration-500 ease-in-out ${isDark ? 'text-slate-100' : 'text-slate-900'} flex flex-col items-center justify-center p-4 md:p-8 relative overflow-x-hidden`}>
 
