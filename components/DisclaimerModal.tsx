@@ -60,7 +60,7 @@ const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isDark, onAccept }) =
                                 Usage Disclaimer
                             </h2>
                             <p className={`text-sm leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                Tact is an AI-powered communication coach. Please confirm you understand the usage guidelines before proceeding.
+                                Parallax is an AI-powered workplace strategist. Please confirm you understand the usage guidelines before proceeding.
                             </p>
                         </div>
 
@@ -84,8 +84,8 @@ const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isDark, onAccept }) =
                                     onChange={(e) => setIsChecked(e.target.checked)}
                                 />
                                 <div className={`w-5 h-5 border-2 rounded transition-all flex items-center justify-center ${isChecked
-                                        ? (isDark ? 'bg-orange-500 border-orange-500' : 'bg-slate-900 border-slate-900')
-                                        : (isDark ? 'border-slate-600 group-hover:border-slate-500' : 'border-slate-300 group-hover:border-slate-400')
+                                    ? (isDark ? 'bg-orange-500 border-orange-500' : 'bg-slate-900 border-slate-900')
+                                    : (isDark ? 'border-slate-600 group-hover:border-slate-500' : 'border-slate-300 group-hover:border-slate-400')
                                     }`}>
                                     {isChecked && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
                                 </div>
@@ -99,12 +99,12 @@ const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isDark, onAccept }) =
                             onClick={handleAccept}
                             disabled={!isChecked}
                             className={`w-full py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-200 ${isChecked
-                                    ? (isDark
-                                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-900/40 hover:bg-orange-400 hover:-translate-y-0.5'
-                                        : 'bg-slate-900 text-white shadow-lg shadow-slate-900/20 hover:bg-slate-800 hover:-translate-y-0.5')
-                                    : (isDark
-                                        ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
-                                        : 'bg-slate-100 text-slate-400 cursor-not-allowed')
+                                ? (isDark
+                                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-900/40 hover:bg-orange-400 hover:-translate-y-0.5'
+                                    : 'bg-slate-900 text-white shadow-lg shadow-slate-900/20 hover:bg-slate-800 hover:-translate-y-0.5')
+                                : (isDark
+                                    ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                                    : 'bg-slate-100 text-slate-400 cursor-not-allowed')
                                 }`}
                         >
                             Enter Tact

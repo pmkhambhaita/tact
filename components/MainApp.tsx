@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Send, RefreshCw, AlertCircle, ShieldCheck, User, Sparkles, Settings2, History, X, Clock, Copy, Check } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 
@@ -17,23 +18,39 @@ const TONE_OPTIONS = ["Professional", "Empathetic", "Direct", "Casual", "Asserti
 // Backend URL (Relative path for Vercel & Vite Proxy)
 const API_URL = '/api/analyze';
 
-const MainApp: React.FC = () => {
-    // Dark Mode State - Lazy Initialization
-    const [isDark, setIsDark] = useState(() => {
-        if (typeof window !== 'undefined') {
-            const savedTheme = localStorage.getItem('theme');
-            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            return savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
-        }
-        return false;
-    });
+import { useTheme } from './ThemeContext';
 
-    const [input, setInput] = useState('');
-    const [settings, setSettings] = useState<AnalysisSettings>({
+interface MainAppProps {
+    mode?: 'standalone' | 'embedded';
+    initialInput?: string;
+    initialSettings?: AnalysisSettings;
+}
+
+const MainApp: React.FC<MainAppProps> = ({ mode = 'standalone', initialInput = '', initialSettings }) => {
+    // Theme from Context
+    const { isDark } = useTheme();
+
+    const location = useLocation();
+    const [input, setInput] = useState(initialInput);
+    const [settings, setSettings] = useState<AnalysisSettings>(initialSettings || {
         receiverType: 'Boss',
         intendedTone: 'Professional',
         userTraits: ''
     });
+
+    useEffect(() => {
+        if (location.state) {
+            const { draftContext, intendedTone } = location.state as any;
+            if (draftContext) setInput(draftContext);
+            if (intendedTone) setSettings(s => ({ ...s, intendedTone }));
+        }
+    }, [location]);
+
+    // Sync state with props if they change (e.g. step transition in Parallax)
+    useEffect(() => {
+        if (initialInput) setInput(initialInput);
+        if (initialSettings) setSettings(initialSettings);
+    }, [initialInput, initialSettings]);
 
     const [loadingApp, setLoadingApp] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
@@ -59,17 +76,7 @@ const MainApp: React.FC = () => {
         }
     }, [isDark]);
 
-    const toggleTheme = () => {
-        setIsDark(prev => {
-            const newMode = !prev;
-            if (newMode) {
-                localStorage.setItem('theme', 'dark');
-            } else {
-                localStorage.setItem('theme', 'light');
-            }
-            return newMode;
-        });
-    };
+
 
     const saveToHistory = (newInput: string, newSettings: AnalysisSettings, newResult: AnalysisResult) => {
         const newItem: HistoryItem = {
@@ -150,15 +157,13 @@ const MainApp: React.FC = () => {
 
             <DisclaimerModal isDark={isDark} onAccept={() => { }} />
 
-            <div className={`min-h-screen transition-colors duration-500 ease-in-out ${isDark ? 'text-slate-100' : 'text-slate-900'} flex flex-col items-center justify-center p-4 md:p-8 relative overflow-x-hidden`}>
+            <div className={`min-h-screen transition-colors duration-500 ease-in-out ${isDark ? 'text-slate-100' : 'text-slate-900'} flex flex-col items-center justify-center relative overflow-x-hidden ${mode === 'embedded' ? 'p-0' : 'p-4 md:p-8'
+                }`}>
 
                 {/* Background Shader */}
                 <ShaderBackground isDark={isDark} />
 
-                {/* Bounce Pull Switch - Lower Z-Index so Sidebar covers it */}
-                <div className="z-50 relative">
-                    <PullSwitch isDark={isDark} toggleTheme={toggleTheme} />
-                </div>
+
 
                 {/* History Sidebar - Higher Z-Index */}
                 <div
@@ -213,12 +218,22 @@ const MainApp: React.FC = () => {
                     />
                 )}
 
-                <header className="w-full max-w-4xl flex justify-between items-center mb-12 relative z-10 animate-in fade-in slide-in-from-top-4 duration-700 text-left">
-                    <h1 className={`text-4xl font-bold tracking-tight flex items-center gap-3 font-serif ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
-                        <div className={`p-2 rounded-xl ${isDark ? 'bg-slate-800 text-orange-400' : 'bg-slate-900 text-white'}`}>
-                            <ShieldCheck className="w-8 h-8" />
-                        </div>
-                        Tact
+                <header className={`w-full max-w-4xl flex justify-between items-center relative z-10 animate-in fade-in slide-in-from-top-4 duration-700 text-left ${mode === 'embedded' ? 'mb-6' : 'mb-12'
+                    }`}>
+                    <h1 className={`font-bold tracking-tight flex items-center gap-3 font-serif ${isDark ? 'text-slate-100' : 'text-slate-800'} ${mode === 'embedded' ? 'text-2xl' : 'text-4xl'
+                        }`}>
+                        {mode === 'standalone' ? (
+                            <>
+                                <div className={`p-2 rounded-xl ${isDark ? 'bg-slate-800 text-orange-400' : 'bg-slate-900 text-white'}`}>
+                                    <ShieldCheck className="w-8 h-8" />
+                                </div>
+                                Tact
+                            </>
+                        ) : (
+                            <span className="text-lg opacity-80 flex items-center gap-2">
+                                <ShieldCheck className="w-5 h-5" /> Tone Refinement
+                            </span>
+                        )}
                         {/* Added for navigation back to landing page if needed, though typically apps keep user in app */}
                     </h1>
                     <div className="flex items-center gap-4">
@@ -237,13 +252,17 @@ const MainApp: React.FC = () => {
                     {!result ? (
                         <div className="flex-1 flex flex-col justify-center transition-all duration-500 ease-in-out">
 
-                            <div className="mb-10 space-y-3 text-center md:text-left">
-                                <h2 className={`text-5xl md:text-6xl font-serif font-medium leading-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-                                    Check your tone.
-                                </h2>
-                                <p className={`text-xl md:text-2xl font-light italic ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                                    Say what you mean, without the mean.
-                                </p>
+                            <div className={`space-y-3 text-center md:text-left ${mode === 'embedded' ? 'mb-6' : 'mb-10'}`}>
+                                {mode === 'standalone' && (
+                                    <>
+                                        <h2 className={`text-5xl md:text-6xl font-serif font-medium leading-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+                                            Check your tone.
+                                        </h2>
+                                        <p className={`text-xl md:text-2xl font-light italic ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                            Say what you mean, without the mean.
+                                        </p>
+                                    </>
+                                )}
                             </div>
 
                             {/* Context Settings Bar */}
