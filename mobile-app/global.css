@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* iOS Liquid Glass Effects */
+@layer utilities {
+  .glass-card {
+    @apply bg-white/70 dark:bg-slate-800/70;
+  }
+
+  .glass-border {
+    @apply border border-white/20 dark:border-white/10;
+  }
+}
