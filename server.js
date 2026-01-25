@@ -12,8 +12,23 @@ const PORT = process.env.PORT || 3001;
 
 // --- Security & Config ---
 app.use(cors({
-  origin: ['https://tact-fix.vercel.app', 'http://localhost:5173', 'http://localhost:3000'] // Allow Prod + Local
+  origin: [
+    'https://tact-fix.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    // Mobile apps send null origin or custom scheme
+  ],
+  // Allow requests without origin (mobile apps)
+  credentials: true,
 }));
+
+// Also allow requests with no origin (React Native/mobile)
+app.use((req, res, next) => {
+  if (!req.headers.origin) {
+    res.header('Access-Control-Allow-Origin', '*');
+  }
+  next();
+});
 app.use(express.json());
 
 const apiLimiter = rateLimit({
