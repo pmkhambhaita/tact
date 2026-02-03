@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider } from './components/ThemeContext';
 import ParallaxSession from './components/ParallaxSession';
 import MobileGuard from './components/MobileGuard';
-import { PullSwitch } from './components/PullSwitch';
+import PullSwitch from './components/PullSwitch';
 import { useTheme } from './components/ThemeContext';
 
 const GlobalSwitch = () => {
