@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Analytics } from "@vercel/analytics/react";
 import MainApp from './components/MainApp';
 import LandingPage from './components/LandingPage';
-import ParallaxSession from './components/ParallaxSession';
+
 import MobileGuard from './components/MobileGuard';
 import { ThemeProvider, useTheme } from './components/ThemeContext';
 import PullSwitch from './components/PullSwitch';
@@ -26,7 +26,7 @@ const App: React.FC = () => {
           <GlobalSwitch />
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/parallax" element={<ParallaxSession />} />
+
             <Route path="/tact" element={<MainApp />} />
             {/* Redirect unknown routes to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
