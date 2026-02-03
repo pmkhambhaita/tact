@@ -28,7 +28,7 @@ interface ParallaxResponse {
     advice: string;
 }
 
-const ParallaxSession: React.FC = () => {
+const ParallaxSessionComponent: React.FC = () => {
     // Phase 0: Input, 1: Strategy, 2: Execution (Tact)
     const [phase, setPhase] = useState<0 | 1 | 2>(0);
     const [situation, setSituation] = useState('');
@@ -352,4 +352,4 @@ const ParallaxSession: React.FC = () => {
     );
 };
 
-export default ParallaxSession;
+export default ParallaxSessionComponent;

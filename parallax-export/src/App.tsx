@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './components/ThemeContext';
-import ParallaxSession from './components/ParallaxSession';
+import ParallaxSessionComponent from './components/ParallaxSessionComponent';
 import MobileGuard from './components/MobileGuard';
 import PullSwitch from './components/PullSwitch';
 import { useTheme } from './components/ThemeContext';
@@ -19,7 +19,7 @@ const App: React.FC = () => {
                     <GlobalSwitch />
                     <Routes>
                         {/* ParallaxSession is the main and only route for this standalone app */}
-                        <Route path="/" element={<ParallaxSession />} />
+                        <Route path="/" element={<ParallaxSessionComponent />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 </MobileGuard>
