@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import Groq from 'groq-sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import rateLimit from 'express-rate-limit';
-import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -17,7 +16,9 @@ app.use(cors({
     'https://tact-fix.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000',
+    // Mobile apps send null origin or custom scheme
   ],
+  // Allow requests without origin (mobile apps)
   credentials: true,
 }));
 
@@ -44,6 +45,7 @@ const googleGenAI = process.env.GOOGLE_API_KEY ? new GoogleGenerativeAI(process.
 
 // --- Models ---
 const GROQ_MODEL = 'groq/compound';
+// Using Gemma 2 9B as requested previously
 const GOOGLE_MODEL_NAME = 'gemma-3-12b-it';
 
 // Health Check
@@ -150,6 +152,143 @@ async function callGoogle(prompt, customSystemPrompt = null) {
   }
 }
 
+// --- Parallax API Endpoint ---
+app.post('/api/parallax/chat', async (req, res) => {
+  const { message } = req.body;
+
+  if (!message) return res.status(400).json({ error: 'Message is required' });
+
+  // Security: Max Length Check
+  if (message.length > 5000) {
+    return res.status(400).json({ error: 'Message too long. Please keep it under 5000 characters.' });
+  }
+
+  const parallaxSystemPrompt = `
+  You are Parallax, an AI workplace strategist and "Devil's Advocate" decision helper.
+  
+  Your goal is to help the user navigate this stressful workplace situation.
+  
+  CRITICAL: Output ONLY a valid JSON object. No Markdown. No Preambles.
+  
+  JSON Schema:
+  {
+    "analysis": {
+      "internal_monologue": "string (A brief, rational assessment of the risks and handbook policies. Quote generic 'Handbook Sections' regarding Integrity, Financial Risk, etc. if relevant to sound authoritative but generic.)",
+      "panic_check": "string (A calming validation of their feelings, e.g., 'It is normal to feel X, but we can fix this.')"
+    },
+    "options": [
+      {
+        "id": "A",
+        "title": "string (Short, catchy title e.g. 'The Honest Approach')",
+        "description": "string (What to do)",
+        "risk_level": "Low" | "Medium" | "High",
+        "pros": ["string"],
+        "cons": ["string"],
+        "dos": ["string (Specific phrase or point to include)"],
+        "donts": ["string (Specific phrase or point to avoid)"],
+        "recommended": boolean
+      },
+      {
+        "id": "B",
+        "title": "string",
+        "description": "string",
+        "risk_level": "Low" | "Medium" | "High",
+        "pros": ["string"],
+        "cons": ["string"],
+        "dos": ["string"],
+        "donts": ["string"],
+        "recommended": boolean
+      }
+    ],
+    "advice": "string (Which option you recommend and briefly why)"
+  }`;
+
+  const userPrompt = `User Situation: "${message}"`;
+
+  // Reuse the existing provider logic
+  // --- Load Balancing & Failover Strategy ---
+  let startProvider = PROVIDERS[providerIndex];
+  if (startProvider === 'GOOGLE' && !googleGenAI) startProvider = 'GROQ';
+  providerIndex = (providerIndex + 1) % PROVIDERS.length;
+
+  try {
+    let result;
+    const executeCall = async (provider) => {
+      // NOTE: We pass the parallax system prompt as the second argument
+      if (provider === 'GROQ') return await callGroq(userPrompt, parallaxSystemPrompt);
+      return await callGoogle(userPrompt, parallaxSystemPrompt);
+    };
+
+    try {
+      result = await executeCall(startProvider);
+    } catch (err) {
+      console.error(`Primary provider ${startProvider} failed. Switching...`);
+      const failover = startProvider === 'GROQ' ? 'GOOGLE' : 'GROQ';
+      result = await executeCall(failover);
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error('All AI Providers failed:', error);
+    res.status(500).json({ error: 'Failed to analyze situation.' });
+  }
+});
+
+app.post('/api/parallax/draft', async (req, res) => {
+  const { situation, strategy, receiver } = req.body;
+
+  if (!situation || !strategy) return res.status(400).json({ error: 'Missing details' });
+
+  const prompt = `
+    You are Parallax, an expert communication drafter.
+    
+    Task: Draft a professional email/message for the user based on their situation and chosen strategy.
+    
+    Situation: "${situation}"
+    Chosen Strategy: "${strategy.title}" - ${strategy.description}
+    Receiver: ${receiver || 'Manager'}
+    
+    Guidelines:
+    - Include these points: ${strategy.dos?.join(', ')}
+    - AVOID these points: ${strategy.donts?.join(', ')}
+    
+    CRITICAL: Output ONLY a JSON object.
+    {
+        "draft": "string (The ready-to-send message text)"
+    }
+    `;
+
+  // --- Load Balancing & Failover Strategy ---
+  let startProvider = PROVIDERS[providerIndex];
+  if (startProvider === 'GOOGLE' && !googleGenAI) startProvider = 'GROQ';
+  providerIndex = (providerIndex + 1) % PROVIDERS.length;
+
+  try {
+    let result;
+    const executeCall = async (provider) => {
+      // Reusing callGroq/callGoogle but they expect a strict schema... 
+      // We need to pass a custom system prompt that matches the Draft schema!
+      const draftSystemPrompt = `You are a professional email drafter. Output JSON only. Schema: { "draft": "string" }`;
+
+      if (provider === 'GROQ') return await callGroq(prompt, draftSystemPrompt);
+      return await callGoogle(prompt, draftSystemPrompt);
+    };
+
+    try {
+      result = await executeCall(startProvider);
+    } catch (err) {
+      console.error(`Primary provider ${startProvider} failed. Switching...`);
+      const failover = startProvider === 'GROQ' ? 'GOOGLE' : 'GROQ';
+      result = await executeCall(failover);
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error('Draft generation failed:', error);
+    res.status(500).json({ error: 'Failed to generate draft.' });
+  }
+});
+
 // --- API Endpoint ---
 app.post('/api/analyze', async (req, res) => {
   const { text, settings } = req.body;
@@ -202,6 +341,9 @@ app.post('/api/analyze', async (req, res) => {
       result.rewritten_score = null;
     }
 
+    // Inject Provider for Client Debugging (Optional)
+    // result._provider = startProvider; 
+
     res.json(result);
 
   } catch (error) {
@@ -211,6 +353,8 @@ app.post('/api/analyze', async (req, res) => {
 });
 
 // Start Server (Only if run directly, NOT when imported)
+import { fileURLToPath } from 'url';
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

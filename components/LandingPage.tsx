@@ -47,21 +47,16 @@ const LandingPage: React.FC = () => {
                     <div className={`p-2 rounded-lg ${isDark ? 'bg-slate-800 text-indigo-400' : 'bg-slate-900 text-white'}`}>
                         <ShieldCheck className="w-6 h-6" />
                     </div>
-                    Parallax
+                    Tact
                 </div>
 
                 <div className="flex gap-4">
                     <Link to="/tact">
-                        <button className={`hidden md:block px-4 py-2.5 rounded-full font-medium text-sm transition-all ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}>
-                            Direct Tone Check
-                        </button>
-                    </Link>
-                    <Link to="/parallax">
                         <button className={`px-6 py-2.5 rounded-full font-medium transition-all ${isDark
                             ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-900/40 hover:shadow-indigo-900/60'
                             : 'bg-slate-900 hover:bg-slate-800 text-white shadow-xl'
                             }`}>
-                            Open Parallax
+                            Open Tone Coach
                         </button>
                     </Link>
                 </div>
@@ -81,27 +76,18 @@ const LandingPage: React.FC = () => {
                     </h1>
 
                     <p className={`text-xl md:text-2xl font-light mb-12 max-w-2xl mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                        AI-powered workplace strategy and tone analysis to help you navigate high-stakes moments.
+                        AI-powered tone analysis to help you navigate high-stakes moments.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link to="/parallax">
+                        <Link to="/tact">
                             <button className={`group relative px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 overflow-hidden transition-all ${isDark
                                 ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-900/50'
                                 : 'bg-slate-900 text-white hover:bg-slate-800'
                                 }`}>
                                 <Zap className="w-5 h-5" />
-                                <span>Start Decision Helper</span>
+                                <span>Check My Tone</span>
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                        </Link>
-
-                        <Link to="/tact">
-                            <button className={`px-8 py-4 rounded-full text-lg font-medium transition-all border ${isDark
-                                ? 'border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white'
-                                : 'border-slate-200 hover:border-slate-400 text-slate-600 hover:text-slate-900'
-                                }`}>
-                                Just Tone Check
                             </button>
                         </Link>
                     </div>
@@ -132,7 +118,7 @@ const LandingPage: React.FC = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="mt-4 flex items-center gap-2 text-sm font-bold text-emerald-500 uppercase tracking-widest"
                             >
-                                <Sparkles className="w-4 h-4" /> Optimized by Tact (Gemma 3 + Llama 3)
+                                <Sparkles className="w-4 h-4" /> Optimized by Tact
                             </motion.div>
                         )}
                     </div>
@@ -141,16 +127,7 @@ const LandingPage: React.FC = () => {
 
             {/* Features */}
             <div className={`relative z-10 py-24 ${isDark ? 'bg-slate-900/50' : 'bg-slate-50/50'}`}>
-                <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
-                    <div className="flex flex-col items-center text-center">
-                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-3xl shadow-lg ${isDark ? 'bg-slate-800 text-indigo-400' : 'bg-white text-indigo-500'}`}>
-                            <Zap />
-                        </div>
-                        <h3 className="text-xl font-bold mb-3 font-serif">Instant Strategy</h3>
-                        <p className={`leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                            Get an objective "Devil's Advocate" perspective on your situation immediately.
-                        </p>
-                    </div>
+                <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl">
                     <div className="flex flex-col items-center text-center">
                         <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-3xl shadow-lg ${isDark ? 'bg-slate-800 text-indigo-400' : 'bg-white text-indigo-500'}`}>
                             <MessageSquare />
@@ -174,7 +151,7 @@ const LandingPage: React.FC = () => {
 
             {/* Footer */}
             <footer className="relative z-10 py-12 text-center text-sm opacity-60">
-                <p>&copy; {new Date().getFullYear()} Parallax. Powered by Groq & Google AI.</p>
+                <p>&copy; {new Date().getFullYear()} Tact. Powered by Groq & Google AI.</p>
             </footer>
         </div>
     );
